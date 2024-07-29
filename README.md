@@ -36,14 +36,19 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 - [Visualization: Evolution of topics associated with anime](link-to-image)
 - Evidence supporting the "Anime spillover effect", with anime-related articles increasingly touching on broader aspects of Japanese culture and society
 
+
 ## Technologies Used
 
 - R (version X.X.X)
 - Key packages: 
-  - stm (for topic modeling)
-  - quanteda (for text preprocessing)
-  - ggplot2 and plotly (for visualization)
-  - dplyr and tidyr (for data manipulation)
+  - [stm](https://www.structuraltopicmodel.com/) (for topic modeling)
+  - [quanteda](https://quanteda.io/) (for text preprocessing)
+  - [ggplot2](https://ggplot2.tidyverse.org/) and [plotly](https://plotly.com/r/) (for visualization)
+  - [dplyr](https://dplyr.tidyverse.org/) and [tidyr](https://tidyr.tidyverse.org/) (for data manipulation)
+  - [furrr](https://furrr.futureverse.org/) (for parallel processing)
+
+The furrr package is particularly noteworthy in this project. It extends purrr's mapping functions to work in parallel, significantly reducing computation time for our topic modeling tasks.
+By leveraging multiprocessing capabilities, I was able to efficiently train multiple topic models and perform other computationally intensive operations, making the analysis of large text datasets more feasible and time-efficient working within R.
 
 ## Repository Structure
 
