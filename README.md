@@ -21,7 +21,7 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 - 1,219 articles from The New York Times mentioning "anime" (1981-2023)
 - Collected via ProQuest archive query
 - Cleaned and preprocessed to remove irrelevant content and standardize text
-
+![articles_anime_plot](https://github.com/user-attachments/assets/d8352139-7e96-4342-b008-89fe0e04d810)
 ## Methodology
 
 1. Data Collection and Preprocessing
@@ -32,8 +32,6 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 
 ## Key Findings
 
-- [Visualization: Increase in anime-related articles over time](link-to-image)
-- [Visualization: Evolution of topics associated with anime](link-to-image)
 - Evidence supporting the "Anime spillover effect", with anime-related articles increasingly touching on broader aspects of Japanese culture and society
 
 
@@ -57,7 +55,7 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 - `output/`: Generated plots and results
 - `docs/`: Detailed documentation and analysis report
 
-## How to Run![articles_anime_plot](https://github.com/user-attachments/assets/d8352139-7e96-4342-b008-89fe0e04d810)
+## How to Run
 
 
 1. Clone this repository
@@ -68,10 +66,10 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 4. Run scripts in numerical order from `01_data_preparation.R` to `05_visualization.R`
 5. View results in the `output/` directory
 
-## Full Report![my_base_plot_white_background](https://github.com/user-attachments/assets/b34a462b-395f-4c93-affb-8deaf95ec051)
+## Full Report
 
 ![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
-
+![my_base_plot_white_background](https://github.com/user-attachments/assets/b34a462b-395f-4c93-affb-8deaf95ec051)
 For a detailed analysis and discussion of findings, please see the [full report](link-to-html-report).
 
 ## Contributors
