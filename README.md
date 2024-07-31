@@ -61,7 +61,9 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 
 1. Clone this repository
 2. Install required R packages: `source("scripts/00_setup.R")`
-3. Gather texts and aggregate in txt file.
+3. You need to gather the texts yourself. I am not allowed to publish content of the New York Times.
+    - You can access the data by using news archives like ProQuest. Most universities should have access for students. Ask your chair or check your Uni website.
+    - Not a student. ProQuest access can be quite expensive but there are similar datasources on the Cyberweb.
 4. Run scripts in numerical order from `01_data_preparation.R` to `05_visualization.R`
 5. View results in the `output/` directory
 
