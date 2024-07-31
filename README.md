@@ -57,7 +57,8 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 - `output/`: Generated plots and results
 - `docs/`: Detailed documentation and analysis report
 
-## How to Run
+## How to Run![articles_anime_plot](https://github.com/user-attachments/assets/d8352139-7e96-4342-b008-89fe0e04d810)
+
 
 1. Clone this repository
 2. Install required R packages: `source("scripts/00_setup.R")`
@@ -67,7 +68,9 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 4. Run scripts in numerical order from `01_data_preparation.R` to `05_visualization.R`
 5. View results in the `output/` directory
 
-## Full Report
+## Full Report![my_base_plot_white_background](https://github.com/user-attachments/assets/b34a462b-395f-4c93-affb-8deaf95ec051)
+
+![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
 
 For a detailed analysis and discussion of findings, please see the [full report](link-to-html-report).
 
