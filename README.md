@@ -1,7 +1,7 @@
 # Anime in The New York Times: A Topic Modeling Analysis
 
 This project analyzes the representation and themes associated with anime in The New York Times articles from 1981 to 2023 using Semi-Supervised Topic Modeling.
-It is based on coursework during my exchange semester at the WASEDA Univerity in Tokyo, Japan.
+It is based on coursework during my exchange semester at the WASEDA University in Tokyo, Japan.
 # Anime in The New York Times: A Topic Modeling Analysis
 
 This project analyzes the representation and themes associated with anime in The New York Times articles from 1981 to 2023 using Semi-Supervised Topic Modeling.
