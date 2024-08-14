@@ -26,14 +26,28 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 
 1. Data Collection and Preprocessing
 2. Exploratory Data Analysis
-3. Semi-Supervised Topic Modeling (STM)
-4. Topic Analysis and Interpretation
-5. Visualization of Results
+![image](https://github.com/user-attachments/assets/14bf72fe-35dd-41b3-a7b1-93ac679e20c8)
+
+4. Semi-Supervised Topic Modeling (STM)
+![image](https://github.com/user-attachments/assets/949c8b8a-22b4-41af-93fd-c798529e544d)
+
+5. Topic Analysis and Interpretation
+6. Visualization of Results
 
 ## Key Findings
 
 - Evidence supporting the "Anime spillover effect", with anime-related articles increasingly touching on broader aspects of Japanese culture and society
 
+![image](https://github.com/user-attachments/assets/e7bf65c1-4669-413c-aa01-ef8dfe162e39)
+Data shows clear diversification of topics alongside the increase in
+number of articles per year
+Suggest
+Suggest that the idea behind Cool Japan has merit
+I find evidence that alongside the increased coverage of anime, the
+number of topics it relates to increases.
+People
+People with interest in Anime are possibly more likely to find out about
+these topics
 
 ## Technologies Used
 
@@ -68,6 +82,16 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 ![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
 
 ![my_base_plot_white_background](https://github.com/user-attachments/assets/b34a462b-395f-4c93-affb-8deaf95ec051)
+
+Which topics are likely to appear together in the same article?
+•
+Entertainment Cluster: Articles discussing Hollywood Cinema often detail Film Directing techniques, while those on Anime & Manga frequently reference Ghibli Films.
+•
+Cultural Dynamics: Pieces on Culinary Trends tend to explore Cultural Heritage, and those focusing on Fashion Trends commonly link to Asian Beauty concepts.
+•
+Digital Media Correlation: Discourse around Social Media intersects with Digital Media impacts, just as Gaming & Fantasy connects with Comic Culture in digital entertainment.
+•
+Socio-Economic Insights: Education & Campus articles typically involve Urban Housing issues, and Governance & Funding is often discussed alongside Political Dynamics.
 
 
 
