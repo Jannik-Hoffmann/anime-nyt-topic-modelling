@@ -19,7 +19,8 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 - Cleaned and preprocessed to remove irrelevant content and standardize text
 ![articles_anime_plot](https://github.com/user-attachments/assets/d8352139-7e96-4342-b008-89fe0e04d810)
 3. Exploratory Data Analysis
-![image](https://github.com/user-attachments/assets/14bf72fe-35dd-41b3-a7b1-93ac679e20c8)
+![image](https://github.com/user-attachments/assets/231efc55-5cb2-43b0-8bb0-d3c46f248897)
+
 ![image](https://github.com/user-attachments/assets/2d8e4193-70ad-4ed4-aac5-65f1e4c41d19)
 
 
