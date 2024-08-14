@@ -14,7 +14,20 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 - Investigate the "Anime spillover effect" hypothesis, which suggests that increased interest in anime leads to broader engagement with Japanese culture
 
 ## Methodology
+### Technologies Used
 
+- R (version 4.3.1)
+- Key packages: 
+  - [stm](https://www.structuraltopicmodel.com/) (for topic modeling)
+  - [quanteda](https://quanteda.io/) (for text preprocessing)
+  - [ggplot2](https://ggplot2.tidyverse.org/) and [plotly](https://plotly.com/r/) (for visualization)
+  - [dplyr](https://dplyr.tidyverse.org/) and [tidyr](https://tidyr.tidyverse.org/) (for data manipulation)
+  - [furrr](https://furrr.futureverse.org/) (for parallel processing)
+
+The furrr package is particularly noteworthy in this project. It extends purrr's mapping functions to work in parallel, significantly reducing computation time for our topic modeling tasks.
+By leveraging multiprocessing capabilities, I was able to efficiently train multiple topic models and perform other computationally intensive operations, making the analysis of large text datasets more feasible and time-efficient working within R.
+
+## Analysis Steps
 1. Data Collection and Preprocessing
 - 1,219 articles from The New York Times mentioning "anime" (1981-2023)
 - Collected via ProQuest archive query
@@ -50,19 +63,6 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 - Cultural Dynamics: Pieces on Culinary Trends tend to explore Cultural Heritage, and those focusing on Fashion Trends commonly link to Asian Beauty concepts.
 - Digital Media Correlation: Discourse around Social Media intersects with Digital Media impacts, just as Gaming & Fantasy connects with Comic Culture in digital entertainment.
 - Socio-Economic Insights: Education & Campus articles typically involve Urban Housing issues, and Governance & Funding is often discussed alongside Political Dynamics.
-
-## Technologies Used
-
-- R (version 4.3.1)
-- Key packages: 
-  - [stm](https://www.structuraltopicmodel.com/) (for topic modeling)
-  - [quanteda](https://quanteda.io/) (for text preprocessing)
-  - [ggplot2](https://ggplot2.tidyverse.org/) and [plotly](https://plotly.com/r/) (for visualization)
-  - [dplyr](https://dplyr.tidyverse.org/) and [tidyr](https://tidyr.tidyverse.org/) (for data manipulation)
-  - [furrr](https://furrr.futureverse.org/) (for parallel processing)
-
-The furrr package is particularly noteworthy in this project. It extends purrr's mapping functions to work in parallel, significantly reducing computation time for our topic modeling tasks.
-By leveraging multiprocessing capabilities, I was able to efficiently train multiple topic models and perform other computationally intensive operations, making the analysis of large text datasets more feasible and time-efficient working within R.
 
 ## Repository Structure
 
