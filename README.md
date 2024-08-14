@@ -2,10 +2,6 @@
 
 This project analyzes the representation and themes associated with anime in The New York Times articles from 1981 to 2023 using Semi-Supervised Topic Modeling.
 It is based on coursework during my exchange semester at the WASEDA University in Tokyo, Japan.
-# Anime in The New York Times: A Topic Modeling Analysis
-
-This project analyzes the representation and themes associated with anime in The New York Times articles from 1981 to 2023 using Semi-Supervised Topic Modeling.
-
 ## Project Overview
 
 This analysis explores the evolution of anime coverage in The New York Times over four decades. Using advanced natural language processing techniques, specifically Semi-Supervised Topic Modeling, I uncover the main themes and trends in anime-related articles, providing insights into the changing perception and cultural impact of anime in the United States.
@@ -32,7 +28,6 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 
 6. Topic Analysis and Interpretation
 ![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
-7. Visualization of Results
 
 ## Key Findings
 
@@ -43,9 +38,10 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 - I find evidence that alongside the increased coverage of anime, the number of topics it relates to increases.
 - People with interest in Anime are possibly more likely to find out about these topics
 
+### Which topics are likely to appear together in the same article?
+
 ![my_base_plot_white_background](https://github.com/user-attachments/assets/b34a462b-395f-4c93-affb-8deaf95ec051)
 
-Which topics are likely to appear together in the same article?
 - Entertainment Cluster: Articles discussing Hollywood Cinema often detail Film Directing techniques, while those on Anime & Manga frequently reference Ghibli Films.
 - Cultural Dynamics: Pieces on Culinary Trends tend to explore Cultural Heritage, and those focusing on Fashion Trends commonly link to Asian Beauty concepts.
 - Digital Media Correlation: Discourse around Social Media intersects with Digital Media impacts, just as Gaming & Fantasy connects with Comic Culture in digital entertainment.
