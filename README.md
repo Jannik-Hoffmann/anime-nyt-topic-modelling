@@ -20,7 +20,8 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 ![articles_anime_plot](https://github.com/user-attachments/assets/d8352139-7e96-4342-b008-89fe0e04d810)
 3. Exploratory Data Analysis
 ![image](https://github.com/user-attachments/assets/14bf72fe-35dd-41b3-a7b1-93ac679e20c8)
-![image](https://github.com/user-attachments/assets/c7ea22c5-07c5-4cab-946e-b57fee9ac238)
+![image](https://github.com/user-attachments/assets/2d8e4193-70ad-4ed4-aac5-65f1e4c41d19)
+
 
 4. Semi-Supervised Topic Modeling (STM)
 ![image](https://github.com/user-attachments/assets/71072d61-11dc-49b3-970a-2ee5846dd703)
