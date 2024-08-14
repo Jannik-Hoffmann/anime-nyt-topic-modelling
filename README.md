@@ -73,10 +73,13 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 ## How to Run
 
 1. Clone this repository
-2. Open the `anime_nyt_analysis.Rmd` file in RStudio
-3. Install required R packages (listed at the beginning of the R Markdown file)
-4. Run all chunks in the R Markdown file or knit the document to HTML
-5. View results in the `output/` directory and in the generated HTML report
+2. You need to gather the texts yourself. I am not allowed to publish content of the New York Times.
+    - You can access the data by using news archives like ProQuest. Most universities should have access for students. Ask your chair or check your Uni website.
+    - Not a student? ProQuest access can be quite expensive but you can still use the code as a template to apply it to other topics.
+3. Open the `anime_nyt_analysis.Rmd` file in RStudio
+4. Install required R packages (listed at the beginning of the R Markdown file)
+5. Run all chunks in the R Markdown file or knit the document to HTML
+6. View results in the `output/` directory and in the generated HTML report
 
 
 ## License
