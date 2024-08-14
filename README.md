@@ -3,7 +3,7 @@
 This project analyzes the representation and themes associated with anime in The New York Times articles from 1981 to 2023 using Semi-Supervised Topic Modeling.
 It is based on coursework during my exchange semester at the WASEDA University in Tokyo, Japan.
 
-For the full presentation, see the [Presentation File](https://github.com/Jannik-Hoffmann/NYT-Articles-about-Anime-Topic-Modelling/blob/main/Unlimited%20power%20of%20anime!.pdf)
+For the full report, look at the [Presentation File](https://github.com/Jannik-Hoffmann/NYT-Articles-about-Anime-Topic-Modelling/blob/main/Unlimited%20power%20of%20anime!.pdf).
 ## Project Overview
 
 This analysis explores the evolution of anime coverage in The New York Times over four decades. Using advanced natural language processing techniques, specifically Semi-Supervised Topic Modeling, I uncover the main themes and trends in anime-related articles, providing insights into the changing perception and cultural impact of anime in the United States.
