@@ -77,9 +77,6 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 5. View results in the `output/` directory and in the generated HTML report
 
 
-![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
-
-
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
