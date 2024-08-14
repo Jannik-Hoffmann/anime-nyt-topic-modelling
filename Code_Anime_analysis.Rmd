@@ -1,0 +1,890 @@
+---
+title: "Text Preparation"
+author: "Jannik Marian Hoffmann"
+date: "2024-01-25"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+library(stringr)
+
+process_articles <- function(file_path) {
+  # Read the entire file into a single string
+  text <- readLines(file_path, warn = FALSE)
+  text <- paste(text, collapse = "\n")
+
+  # Split the text into articles (assuming each article is separated by a line of underscores)
+  articles <- strsplit(text, "____________________________________________________________")[[1]]
+
+  # Initialize an empty dataframe
+  df <- data.frame(Date = character(), Title = character(), Author = character(), Text = character(), stringsAsFactors = FALSE)
+
+  # Loop through each article and extract information
+  for (article in articles) {
+    # Extract the date
+    date <- str_extract(article, "\\b\\d{4}-\\d{2}-\\d{2}\\b")
+
+    # Extract the title
+    title <- str_extract(article, "(?<=Titel: ).*(?=\\n)")
+    
+    # Extract the theme
+    theme <- str_extract(article, "(?<=Thema: ).*(?=\\n)")
+
+    # Extract the author
+    author <- str_extract(article, "(?<=Autor: ).*(?=\\n)")
+
+    # Extract the full text
+    # Assuming the full text starts with "Volltext:" and ends before "Thema:"
+    full_text_start <- regexpr("Volltext:", article)
+    full_text_end <- regexpr("Thema:", article)
+    if (full_text_start != -1 && full_text_end != -1) {
+      full_text <- substr(article, full_text_start + nchar("Volltext: "), full_text_end - 1)
+    } else {
+      full_text <- NA
+    }
+
+    # Add the extracted information to the dataframe
+    # Add the extracted information to the dataframe
+    df <- rbind(df, data.frame(Date = date, Title = title, Author = author, Text = full_text, Theme = theme, stringsAsFactors = FALSE))
+  }
+
+  return(df)
+}
+
+# Replace with your actual file path
+file_path <- "anime_texts.txt"
+df <- process_articles(file_path)
+
+head(df)
+
+# Assuming your dataframe is named df
+df <- df[-1, ]
+
+
+df$Text <- stringi::stri_replace_all_fixed(df$Text, "’", "'", vectorize_all = FALSE)
+df$Text <- stringi::stri_replace_all_fixed(df$Text, "New York Times", "NYT", vectorize_all = FALSE)
+df$Text <- stringi::stri_replace_all_fixed(df$Text, "—", "", vectorize_all = FALSE)
+df$Text <- stringi::stri_replace_all_fixed(df$Text, "Dieses Bild vergr  ern.", "", vectorize_all = FALSE)
+df$Text <- stringi::stri_replace_all_regex(df$Text, "\\(PHOTOGRAPH BY [^)]+\\)", "", vectorize_all = FALSE)
+
+# Remove strings like "(PHOTOGRAPHS BY ....)"
+df$Text <- stringi::stri_replace_all_regex(df$Text, "\\(PHOTOGRAPHS BY [^)]+\\)", "", vectorize_all = FALSE)
+
+# Assuming your dataframe is named df and the column containing the text is df$Text
+
+# Remove entries that contain "jardin anime"
+df <- df[!grepl("jardin anime", df$Text, ignore.case = TRUE), ]
+# Assuming your dataframe is named df and the column containing the text is df$Text
+
+# Remove entries that contain "jardin anime"
+df <- df[!grepl("nicht verfügbar", df$Text, ignore.case = TRUE), ]
+
+
+# also I manually removed an extra section about the NYT Opinion which does not belong in articles but was included in the dataset
+```
+
+
+```{r}
+library(ggplot2)
+library(lubridate)
+
+
+# Assuming your date column is named 'Date' and in the format "YYYY-MM-DD"
+# Convert the Date column to a Date type if it's not already
+df$Date <- as.Date(df$Date)
+
+# Extract the year
+df$Year <- year(df$Date)
+df$Year2<-df$Year-1980
+
+# Count the number of articles per year
+articles_per_year <- table(df$Year)
+
+# Convert to a dataframe for ggplot
+articles_per_year_df <- as.data.frame(articles_per_year)
+
+# Plotting
+# Plotting with x-axis labels for every 5 years (assuming years are factors)
+ggplot(articles_per_year_df, aes(x = Var1, y = Freq)) +
+  geom_bar(stat = "identity") +
+  scale_x_discrete(breaks = levels(factor(articles_per_year_df$Var1))[c(TRUE, rep(FALSE, 4))]) +
+  xlab("Year") +
+  ylab("Number of Articles") +
+  ggtitle("Number of Articles per Year")
+
+
+# Ensure the Year column is numeric
+df$Year <- as.numeric(as.character(df$Year))
+
+# Create a complete sequence of years
+all_years <- data.frame(Year = seq(min(df$Year, na.rm = TRUE), max(df$Year, na.rm = TRUE), by = 1))
+
+# Count the number of articles per year
+articles_per_year <- as.data.frame(table(df$Year))
+
+# Merge to ensure all years are included
+complete_data <- merge(all_years, articles_per_year, by.x = "Year", by.y = "Var1", all.x = TRUE)
+complete_data[is.na(complete_data$Freq), "Freq"] <- 0
+
+# Rename columns for clarity
+names(complete_data) <- c("Year", "Number of Articles")
+
+# Plotting with all years, including those with zero articles
+plot_object <- ggplot(complete_data, aes(x = Year, y = `Number of Articles`)) +
+  geom_bar(stat = "identity") +
+  scale_x_continuous(breaks = seq(min(complete_data$Year), max(complete_data$Year), by = 5)) +
+  xlab("Year") +
+  ylab("Number of Articles") +
+  ggtitle("Number of Articles per Year featuring the word anime in the New York Times")
+
+# Assuming you have a ggplot object, replace ggplot_object with your actual plot
+ggsave(filename = "articles_anime_plot.png", plot = plot_object, width = 10, height = 6, dpi = 300)
+
+
+```
+
+
+```{r}
+# Count the occurrences of each theme
+theme_counts <- table(df$Theme)
+
+# Convert the table to a dataframe for better readability
+theme_counts_df <- as.data.frame(theme_counts)
+
+# Rename the columns for clarity
+names(theme_counts_df) <- c("Theme", "Count")
+
+# View the resulting dataframe
+print(theme_counts_df)
+library(tidyr)
+library(dplyr)
+# Assuming your dataframe is named df and the column with themes is df$Theme
+# Split the themes and convert to a long format
+theme_long_df <- df %>%
+  mutate(Theme = strsplit(as.character(Theme), ";\\s*")) %>%
+  unnest(Theme)
+
+# Count the occurrences of each theme
+theme_counts <- theme_long_df %>%
+  group_by(Theme) %>%
+  summarise(Count = n())
+
+# View the resulting table
+print(theme_counts)
+
+library(tidyr)
+library(dplyr)
+
+# Assuming your dataframe is named df and the column with themes is df$Theme
+
+# Split the themes, convert to a long format, and count occurrences
+theme_counts <- df %>%
+  mutate(Theme = strsplit(as.character(Theme), ";\\s*")) %>%
+  unnest(Theme) %>%
+  group_by(Theme) %>%
+  summarise(Count = n()) %>%
+  arrange(desc(Count))  # Sort by Count in descending order
+
+# View the sorted table
+print(theme_counts)
+```
+
+```{r}
+library(cld2)
+library(dplyr)
+library(lubridate)
+library(quanteda)
+library(readtext)
+library(quanteda.textstats)
+library(stringi)
+library(purrr)
+# Custom function to replace multi-word expressions with unique identifiers (case insensitive)
+replaceMultiWordExpressions <-
+  function(text, expressions, identifiers) {
+    for (i in seq_along(expressions)) {
+      # Create a case-insensitive regex pattern
+      # Add '\\b' to ensure whole word matching
+      pattern <- paste0("(?i)\\b", expressions[i], "\\b")
+      text <-
+        stringi::stri_replace_all_regex(text, pattern, identifiers[i], vectorize_all = FALSE)
+    }
+    return(text)
+  }
+
+tokenizeAndClean <- function(corpus, stopwords_list, stemming) {
+  # Tokenize and clean the corpus
+
+  tokens <- tokens(
+    corpus,
+    remove_punct = TRUE,  # Remove punctuation
+    remove_numbers = TRUE, # Remove numbers
+    remove_symbols = TRUE, # Remove symbols including special characters
+    split_hyphens = FALSE,
+    remove_url = TRUE,
+    split_tags = TRUE,
+    remove_separators = TRUE
+  ) %>%
+    tokens_tolower() %>%
+    tokens_remove(pattern = stopwords_list, case_insensitive = TRUE)
+
+  if (stemming) {
+    tokens <- tokens_wordstem(tokens)
+  }
+
+  return(tokens)
+}
+
+# Custom function to restore multi-word expressions
+restoreMultiWordExpressions <-
+  function(tokens, identifiers, expressions) {
+    # Apply tokens_replace for each identifier-expression pair
+    for (i in seq_along(identifiers)) {
+      tokens <-
+        tokens_replace(tokens, identifiers[i], expressions[i], valuetype = "fixed")
+    }
+    return(tokens)
+  }
+
+# Function to process a document-feature matrix
+processDFM <- function(dfm) {
+  empty_docs <- which(rowSums(dfm) == 0)
+  if (length(empty_docs) > 0) {
+    print(paste("Empty documents IDs:", toString(empty_docs[1:min(10, length(empty_docs))])))
+  }
+  dfm <- dfm[-empty_docs, ]
+  dfm_dimensions <- dim(dfm)
+  cat(
+    "Number of documents:",
+    dfm_dimensions[1],
+    "Number of features:",
+    dfm_dimensions[2],
+    "\n"
+  )
+  term_freq_data <- textstat_frequency(dfm)
+  print(head(term_freq_data))
+  return(dfm)
+}
+
+createTokenDataFrame <- function(tokens, dovar_name) {
+  # Step 1: Extract the Original Texts
+  original_texts <- docvars(tokens, dovar_name)
+  
+  # Step 2: Convert Tokens to Character Vector
+  # This creates a list of character vectors, one for each document
+  tokenized_texts <- lapply(tokens, as.character)
+  tokenized_texts <- sapply(tokenized_texts, paste, collapse = " ")
+  
+  # Step 3: Create a Dataframe
+  df <-
+    data.frame(
+      OriginalText = original_texts,
+      TokenizedText = tokenized_texts,
+      stringsAsFactors = FALSE
+    )
+  
+  return(df)
+}
+
+df$text2<-df$Text
+
+
+
+# Create a corpus
+corpus_original <- corpus(df,text="Text")
+print(head(summary(corpus_original)))
+
+# Define custom stopwords
+all_english_stopwords <- unique(unlist(lapply(stopwords::stopwords_getsources(), function(source) {
+  if ("en" %in% stopwords::stopwords_getlanguages(source)) stopwords(language = "en", source = source)
+})))
+
+# Add additional stopwords
+final_stopwords_list <- unique(c(all_english_stopwords, c("rt", "amp", "a.m", "p.m","--")))
+# Remove a specific stopword from the default list, as I care about mentions of "microsoft"
+final_stopwords_list <- final_stopwords_list[final_stopwords_list != "microsoft"]
+final_stopwords_list <- sort(final_stopwords_list)
+
+# Initial tokenization and cleaning
+tokens_processed <-
+  tokenizeAndClean(corpus_original, final_stopwords_list,stemming=TRUE)
+
+# Create and process document-feature matrix
+dfm_processed <- dfm(tokens_processed)
+#Using very cautious trimming
+dfm_processed<-dfm_trim(dfm_processed, min_docfreq = 10,verbose=TRUE)
+dfm_processed <- processDFM(dfm_processed)
+
+# These dataframes are for inspection and debugging 
+df3 <- createTokenDataFrame(tokens_processed, "text2")
+df_2<-textstat_frequency(dfm_processed)
+```
+
+```{r Topic Modelling,warning=FALSE,message=FALSE}
+library(stm)
+library(furrr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+# Convert to stm format
+DfmStm <-
+  convert(dfm_processed,
+          to = "stm",
+          docvars = docvars(dfm_processed))
+
+# # Setup Multiprocessing for decreased runtime - really useful, it cuts down my render time massively
+plan(multisession,workers=6)
+set.seed(0123)
+# # Train multiple topic models - I am using a method by Julia Siegl(2018) to directly access the diagnostics instead of searchK, also to allow for plotting it with ggplot - This is the source (https://juliasilge.com/blog/evaluating-stm/). Plots are also based on her ideas and adjusted for my usecase.
+# 
+topic_vector = c(15:35)
+many_models <- tibble(K = topic_vector) %>%
+  mutate(topic_model = future_map(
+    K,
+    ~ stm(
+      DfmStm$documents,
+      DfmStm$vocab,
+      K = .,
+      prevalence = ~ s(Year2),
+      data = DfmStm$meta,
+      init.type = "Spectral",
+      verbose = FALSE
+    ),
+    .options = furrr_options(seed = TRUE)
+  ))
+
+save(many_models, file = "many_models.RData")
+load("many_models.RData")
+# Create a heldout set for evaluation
+documents <- DfmStm$documents
+vocab <- DfmStm$vocab
+heldout <- make.heldout(documents, vocab)
+
+# Evaluate the models - getting the diagnostics into result dataframe
+k_result <- many_models %>%
+  mutate(
+    exclusivity = map(topic_model, exclusivity),
+    semantic_coherence = map(topic_model, ~ semanticCoherence(.x, documents)),
+    eval_heldout = map(topic_model, eval.heldout, heldout$missing),
+    residual = map(topic_model, ~ checkResiduals(.x, documents)),
+    bound = map_dbl(topic_model, function(x)
+      max(x$convergence$bound)),
+    lfact = map_dbl(topic_model, function(x)
+      lfactorial(x$settings$dim$K)),
+    lbound = bound + lfact,
+    iterations = map_dbl(topic_model, function(x)
+      length(x$convergence$bound))
+  )
+
+# Diagnostic plots
+k_result %>%
+  transmute(
+    K,
+    `Lower bound` = lbound,
+    Residuals = map_dbl(residual, "dispersion"),
+    `Semantic coherence` = map_dbl(semantic_coherence, mean),
+    `Held-out likelihood` = map_dbl(eval_heldout, "expected.heldout")
+  ) %>%
+  gather(Metric, Value, -K) %>%
+  ggplot(aes(K, Value, color = Metric)) +
+  geom_line(size = 1.5,
+            alpha = 0.7,
+            show.legend = FALSE) +
+  facet_wrap( ~ Metric, scales = "free_y") +
+  labs(
+    x = "K (number of topics)",
+    y = NULL,
+    title = "Model diagnostics by number of topics",
+    subtitle = "Diagnostics indicate the optimal number of topics"
+  )
+
+#Plotting Exclusitivy and semantic coherence
+k_result %>%
+  select(K, exclusivity, semantic_coherence) %>%
+  filter(K %in% topic_vector) %>%
+  unnest() %>%
+  mutate(K = as.factor(K)) %>%
+  ggplot(aes(semantic_coherence, exclusivity, color = K)) +
+  geom_point(size = 2, alpha = 0.7) +
+  labs(
+    x = "Semantic coherence",
+    y = "Exclusivity",
+    title = "Comparing exclusivity and semantic coherence",
+    subtitle = "Models with fewer topics have higher semantic coherence for more topics, but lower exclusivity"
+  )
+
+# Ensure proper unnesting
+k_result_expanded <- k_result %>%
+  select(K, exclusivity, semantic_coherence) %>%
+  unnest(cols = c(exclusivity, semantic_coherence))
+
+# Prepare mean and median data for plotting
+mean_median_df <- k_result_expanded %>%
+  group_by(K) %>%
+  summarise(
+    mean_exclusivity = mean(exclusivity),
+    median_exclusivity = median(exclusivity),
+    mean_coherence = mean(semantic_coherence),
+    median_coherence = median(semantic_coherence),
+    .groups = 'drop'
+  ) %>%
+  # Reshape for plotting: one row for each mean and median
+  gather(key, value, -K, factor_key = TRUE) %>%
+  separate(key, into = c("statistic", "metric"), sep = "_") %>%
+  spread(metric, value) %>%
+  mutate(statistic = factor(statistic, levels = c("mean", "median")))
+
+ggplot(mean_median_df,
+       aes(
+         x = coherence,
+         y = exclusivity,
+         color = as.factor(K),
+         shape = statistic
+       )) +
+  geom_point(size = 3) +
+  geom_text(aes(label = K),
+            vjust = -1,
+            hjust = 1.5,
+            size = 3) +
+  scale_shape_manual(
+    values = c(17, 18),
+    name = "Statistic",
+    labels = c("Mean", "Median")
+  ) +
+  scale_color_discrete(name = "K") +
+  labs(
+    x = "Semantic coherence",
+    y = "Exclusivity",
+    title = "Mean and Median of Exclusivity and Semantic Coherence",
+    subtitle = "Across Different Numbers of Topics (K)"
+  ) +
+  theme(legend.position = "bottom")
+# Prepare mean and median data for plotting
+
+# Prepare mean data for plotting
+mean_df <- k_result_expanded %>%
+  group_by(K) %>%
+  summarise(
+    mean_exclusivity = mean(exclusivity),
+    mean_coherence = mean(semantic_coherence),
+    .groups = 'drop'
+  )
+
+# Create the plot with only mean values
+ggplot(mean_df,
+       aes(x = mean_coherence, y = mean_exclusivity, color = as.factor(K))) +
+  geom_point(size = 3) +
+  geom_text(aes(label = K),
+            vjust = -1,
+            hjust = 1.5,
+            size = 3) +
+  scale_color_discrete(name = "K") +
+  labs(
+    x = "Mean Semantic Coherence",
+    y = "Mean Exclusivity",
+    title = "Mean of Exclusivity and Semantic Coherence",
+    subtitle = "Across Different Numbers of Topics (K)"
+  ) +
+  theme(legend.position = "bottom")
+```
+
+
+```{r}
+library(tidyverse)
+library(tidytext)
+topic_model10 <- k_result %>%
+  filter(K == 29) %>%
+  pull(topic_model) %>%
+  .[[1]]
+
+stmFitted <- topic_model10
+labelTopics(stmFitted,n=10)
+# Assuming topic_words is defined somewhere in your code
+# get the top terms
+data_text="Topic 1 Top Words:
+ 	 Highest Prob: film, movi, anim, rate, time, stori, director, pg-13, direct, scott 
+ 	 FREX: pg-13, dargi, kon, rate, tarantino, scott, holden, sequenc, minut, blu-ray 
+ 	 Lift: singer-songwrit, pg-13, kino, holden, oshii, kon, tarantino, paprika, mamoru, dargi 
+ 	 Score: pg-13, dargi, kon, singer-songwrit, film, blu-ray, tarantino, holden, oshii, scott 
+Topic 2 Top Words:
+ 	 Highest Prob: anim, cartoon, televis, network, seri, charact, episod, time, program, children 
+ 	 FREX: network, cartoon, nickelodeon, cabl, televis, episod, broadcast, viewer, boondock, simpson 
+ 	 Lift: mate, powerpuff, boondock, nickelodeon, clone, rerun, squarep, network, naruto, spongebob 
+ 	 Score: mate, nickelodeon, network, boondock, powerpuff, cabl, cartoon, episod, fox, dvd 
+Topic 3 Top Words:
+ 	 Highest Prob: art, museum, street, artist, paint, galleri, exhibit, smith, johnson, collect 
+ 	 FREX: cotter, 535-7710, rosenberg, johnson, 708-9400, whitney, metropolitan, biennial, smith, picasso 
+ 	 Lift: rosenberg, 288-0700, 784-2084, 857-0000, cezann, edifi, frick, gerrit, jean-antoin, needlework 
+ 	 Score: 535-7710, cotter, museum, galleri, rosenberg, 708-9400, 570-3600, sculptur, johnson, utagawa 
+Topic 4 Top Words:
+ 	 Highest Prob: car, design, contest, japanes, includ, machin, race, photograph, sport, artist 
+ 	 FREX: contest, car, bike, rider, rhode, slot, speed, pageant, finalist, racer 
+ 	 Lift: rhode, finalist, rider, motor, pageant, bike, contest, auto, motorcycl, racer 
+ 	 Score: rhode, bike, rider, finalist, car, czech, racer, contest, motorcycl, auto 
+Topic 5 Top Words:
+ 	 Highest Prob: theater, music, street, opera, perform, west, festiv, product, play, orchestra 
+ 	 FREX: opera, orchestra, symphoni, conduct, philharmon, pianist, preview, ensembl, theater, rooney 
+ 	 Lift: milan, philharmon, orchestra, symphoni, mozart, pianist, conduct, cellist, sondheim, preview 
+ 	 Score: orchestra, symphoni, philharmon, milan, quartet, theater, rooney, opera, pianist, conduct 
+Topic 6 Top Words:
+ 	 Highest Prob: fashion, design, dress, wear, model, photograph, cloth, york, time, style 
+ 	 FREX: fashion, boot, dress, skirt, lolita, shirt, runway, wore, cloth, outfit 
+ 	 Lift: lolita, runway, balenciaga, denim, corset, plaid, skirt, goth, boot, sartori 
+ 	 Score: lolita, runway, leather, skirt, shirt, tiktok, corset, strawberri, goth, balenciaga 
+Topic 7 Top Words:
+ 	 Highest Prob: video, peopl, compani, user, onlin, servic, internet, time, twitch, creat 
+ 	 FREX: twitch, app, user, discord, chat, googl, internet, site, download, search 
+ 	 Lift: discord, twitch, zuckerberg, microsoft, diffus, app, googl, chat, download, meta 
+ 	 Score: discord, twitch, user, app, microsoft, diffus, download, server, meta, chat 
+Topic 8 Top Words:
+ 	 Highest Prob: compani, product, store, market, netflix, toy, sale, includ, busi, video 
+ 	 FREX: sale, toy, retail, consum, store, brand, compani, netflix, kitti, market 
+ 	 Lift: augment, e-commerc, wal-mart, shopper, retail, snapchat, kitti, walmart, nike, apparel 
+ 	 Score: augment, netflix, retail, snapchat, subscrib, toy, revenu, analyst, hulu, walmart 
+Topic 9 Top Words:
+ 	 Highest Prob: street, children, avenu, museum, art, york, center, theater, festiv, music 
+ 	 FREX: noon, sunday, saturday, avenu, friday, admiss, workshop, children, tuesday, thursday 
+ 	 Lift: terrac, sunday, saturday, tuesday, friday, noon, thursday, wednesday, registr, astoria 
+ 	 Score: saturday, terrac, sunday, noon, avenu, museum, tuesday, friday, admiss, thursday 
+Topic 10 Top Words:
+ 	 Highest Prob: peopl, post, twitter, media, social, china, chines, onlin, pronoun, tiktok 
+ 	 FREX: twitter, pronoun, tiktok, gender, post, man, china, hong, chines, kong 
+ 	 Lift: pronoun, nonbinari, tran, xi, twitter, kardashian, tiktok, billionair, man, dislik 
+ 	 Score: pronoun, tiktok, twitter, nonbinari, user, gender, hong, tran, china, instagram 
+Topic 11 Top Words:
+ 	 Highest Prob: game, player, play, final, video, time, chess, fantasi, stori, match 
+ 	 FREX: chess, game, player, puzzl, gamer, leagu, enemi, clan, match, role-play 
+ 	 Lift: chess, playstat, nintendo, puzzl, clan, multiplay, role-play, game, gamer, player 
+ 	 Score: chess, game, player, gamer, playstat, role-play, nintendo, enemi, leagu, oppon 
+Topic 12 Top Words:
+ 	 Highest Prob: polic, fox, olymp, time, peopl, japan, fight, anim, tokyo, kill 
+ 	 FREX: olymp, kyoto, athlet, polic, suspect, fox, sake, stone, fighter, coach 
+ 	 Lift: olympian, nhk, olymp, fractur, medal, kyoto, injur, skate, stole, abe 
+ 	 Score: kyoto, olymp, olympian, fox, athlet, nhk, osaka, tokyo, medal, nbc 
+Topic 13 Top Words:
+ 	 Highest Prob: school, student, colleg, children, famili, read, peopl, friend, parent, time 
+ 	 FREX: student, colleg, campus, school, class, kim, woo, hispan, parent, studi 
+ 	 Lift: tooth, curriculum, campus, woo, student, tutor, yale, hispan, enrol, scholarship 
+ 	 Score: student, tooth, woo, campus, nguyen, census, hispan, percent, class, kim 
+Topic 14 Top Words:
+ 	 Highest Prob: hous, day, time, peopl, live, job, hotel, sleep, start, apart 
+ 	 FREX: homeless, sleep, apart, shelter, mom, worker, hotel, bed, clean, hous 
+ 	 Lift: housekeep, shelter, homeless, shower, chronic, supermarket, slept, cleaner, tenant, sleep 
+ 	 Score: homeless, housekeep, shelter, shower, hotel, blanco, worker, tenant, mom, wilson 
+Topic 15 Top Words:
+ 	 Highest Prob: japanes, japan, anim, manga, charact, tokyo, cultur, seri, american, book 
+ 	 FREX: manga, japan, japanes, translat, astro, samurai, tokyo, publish, otaku, tezuka 
+ 	 Lift: astro, evangelion, fullmet, shonen, alchemist, tezuka, manga, otaku, kabuki, kawaii 
+ 	 Score: astro, japan, manga, tokyo, japanes, otaku, tezuka, samurai, evangelion, alchemist 
+Topic 16 Top Words:
+ 	 Highest Prob: direct, film, play, star, documentari, director, movi, stori, john, comedi 
+ 	 FREX: documentari, direct, hamlet, co-star, sundanc, jennif, emma, jason, screenwrit, biopic 
+ 	 Lift: hamlet, wahlberg, ronan, carel, fienn, cate, blanchett, mara, rockwel, brett 
+ 	 Score: hamlet, documentari, filmmak, co-star, comedi, sundanc, film, cann, direct, thriller 
+Topic 17 Top Words:
+ 	 Highest Prob: art, artist, paint, galleri, murakami, museum, exhibit, photograph, street, figur 
+ 	 FREX: murakami, galleri, paint, sculptur, painter, takashi, curat, simmon, vuitton, abstract 
+ 	 Lift: 288-6400, murakami, pavilion, gill, untitl, vuitton, pointi, simmon, acryl, self-portrait 
+ 	 Score: murakami, galleri, sculptur, paint, museum, painter, 288-6400, exhibit, chelsea, gagosian 
+Topic 18 Top Words:
+ 	 Highest Prob: music, song, album, video, band, sound, record, perform, pop, time 
+ 	 FREX: album, song, band, guitar, singer, songwrit, vocal, punk, music, sing 
+ 	 Lift: pickup, synth, songwrit, drummer, album, emo, vocalist, chord, guitarist, guitar 
+ 	 Score: album, songwrit, song, pickup, guitar, bowi, jazz, band, madonna, drummer 
+Topic 19 Top Words:
+ 	 Highest Prob: miyazaki, film, anim, studio, ghibli, spirit, princess, hayao, japanes, stori 
+ 	 FREX: miyazaki, ghibli, mononok, hayao, takahata, suzuki, princess, spirit, lupin, shinkai 
+ 	 Lift: lupin, mononok, shinkai, miyazaki, ghibli, takahata, ponyo, totoro, hayao, suzuki 
+ 	 Score: miyazaki, ghibli, lupin, mononok, takahata, hayao, suzuki, totoro, shinkai, princess 
+Topic 20 Top Words:
+ 	 Highest Prob: comic, black, book, charact, fan, fiction, peopl, cultur, convent, stori 
+ 	 FREX: nerd, holm, comic, matrix, fiction, cosplay, marvel, black, scienc, convent 
+ 	 Lift: holm, matrix, nerd, x-men, panther, toro, burton, cosplay, fandom, spider-man 
+ 	 Score: holm, matrix, nerd, cosplay, comic-con, fandom, comic, trek, spider-man, fiction 
+Topic 21 Top Words:
+ 	 Highest Prob: citi, restaur, street, food, bar, tokyo, shop, japanes, hotel, start 
+ 	 FREX: cookbook, chef, restaur, recip, cafe, sushi, wine, pancak, richmond, rice 
+ 	 Lift: lui, cuisin, salad, cookbook, pancak, pork, recip, sushi, richmond, shrimp 
+ 	 Score: cookbook, lui, richmond, pancak, restaur, chef, recip, tokyo, sushi, cuisin 
+Topic 22 Top Words:
+ 	 Highest Prob: film, danc, festiv, dancer, video, director, american, perform, movi, anim 
+ 	 FREX: dancer, danc, ballet, cao, korean, cinema, rain, filmmak, choreograph, yi 
+ 	 Lift: impish, cao, yi, choreographi, dancer, wong, detach, rehears, crouch, zhang 
+ 	 Score: cao, ballet, dancer, impish, yi, film, filmmak, cann, hong, cinema 
+Topic 23 Top Words:
+ 	 Highest Prob: asian, hair, white, american, women, makeup, beauti, eye, oil, cultur 
+ 	 FREX: makeup, oil, hair, asian, brush, queer, feminin, bumbl, cosmet, male 
+ 	 Lift: wax, lipstick, cosmet, bumbl, makeup, masculin, oil, ancestri, assimil, trope 
+ 	 Score: wax, makeup, asian, cosmet, queer, feminin, oil, bumbl, asian-american, masculin 
+Topic 24 Top Words:
+ 	 Highest Prob: york, fund, peopl, nuclear, societi, govern, organ, licens, public, busi 
+ 	 FREX: nuclear, fund, applic, licens, roy, fund-rais, legal, terrorist, plant, convict 
+ 	 Lift: fund-rais, nuclear, cuban, fukushima, marijuana, archdioces, fund, roy, equiti, applic 
+ 	 Score: fund-rais, nuclear, lawmak, fund, marijuana, fukushima, applic, cuban, roy, donat 
+Topic 25 Top Words:
+ 	 Highest Prob: time, peopl, rap, hip-hop, record, start, play, music, rapper, lot 
+ 	 FREX: rap, hip-hop, rapper, riddl, tenni, osaka, explet, rhyme, tape, fritz 
+ 	 Lift: riddl, explet, rap, fritz, tenni, rhyme, freestyl, rapper, osaka, nasti 
+ 	 Score: riddl, rap, osaka, tenni, rapper, explet, hip-hop, fritz, rhyme, lil 
+Topic 26 Top Words:
+ 	 Highest Prob: offici, polit, republican, unit, democrat, citi, peopl, hous, presid, parti 
+ 	 FREX: republican, democrat, variant, vaccin, gosar, trump, minnesota, elect, document, infect 
+ 	 Lift: minnesota, ocasio-cortez, gosar, congression, variant, republican, biden, vaccin, alexandria, democrat 
+ 	 Score: minnesota, gosar, republican, ocasio-cortez, vaccin, democrat, variant, biden, senat, infect 
+Topic 27 Top Words:
+ 	 Highest Prob: seri, season, netflix, stori, stream, episod, play, time, anim, watch 
+ 	 FREX: netflix, season, stream, bebop, episod, hbo, hulu, pilgrim, amazon, comedi 
+ 	 Lift: four-part, pilgrim, rom-com, cw, acorn, starz, true-crim, horseman, dramedi, mini-seri 
+ 	 Score: netflix, pilgrim, hulu, hbo, bebop, stream, episod, season, amazon, comedi 
+Topic 28 Top Words:
+ 	 Highest Prob: napl, citi, rome, church, day, greek, san, museum, itali, bay 
+ 	 FREX: napl, rome, greek, itali, di, bay, fowler, del, church, piazza 
+ 	 Lift: fowler, napl, piazza, inescap, rome, greek, purgatori, monasteri, luigi, euro 
+ 	 Score: napl, fowler, rome, piazza, di, itali, greek, baroqu, church, del 
+Topic 29 Top Words:
+ 	 Highest Prob: movi, film, star, studio, disney, war, anim, critic, hollywood, fan 
+ 	 FREX: movi, pixar, hollywood, disney, luca, warner, rebel, lucasfilm, review, slayer 
+ 	 Lift: slayer, lucasfilm, jedi, lasset, rebel, mgm, lionsgat, pixar, luca, squad 
+ 	 Score: slayer, pixar, lucasfilm, disney, movi, warner, film, comic-con, lasset, crunchyrol"
+
+
+
+```
+
+
+```{r}
+topic_names1 <- c("Cinematic Analysis & Ratings", "Animation & TV Networks", "Art & Gallery Exhibitions", 
+                 "Automotive Design & Competitions", "Performing Arts & Opera", "Fashion Industry & Trends", 
+                 "Digital Media & Online Platforms", "Retail & Entertainment Business", "Cultural Events & Activities", 
+                 "Social Media & Online Discourse", "Gaming & Fantasy Worlds", "Sports & Japanese Influence", 
+                 "Education & Student Life", "Urban Living & Housing Issues", "Japanese Animation & Manga", 
+                 "Documentaries & Film Directing", "Artistic Expression & Modern Art", "Music Industry & Albums", 
+                 "Miyazaki & Studio Ghibli Films", "Comic Culture & Fandom", "Culinary Trends & Restaurants", 
+                 "Dance & Film Festivals", "Asian Beauty & Cultural Identity", "Societal Funding & Governance", 
+                 "Rap Music & Hip-Hop Culture", "Political Dynamics & Policies", "Streaming Services & Dramas", 
+                 "Historical Sites & Cultural Heritage", "Movie Industry & Hollywood")
+
+topic_names <- c("Cinema & Ratings", "Animation & TV", "Art Exhibitions", "Auto Design & Racing", 
+                 "Performing Arts", "Fashion Trends", "Digital Media", "Retail & Entertainment", 
+                 "Cultural Events", "Social Media Discourse", "Gaming & Fantasy", "Sports & Japan", 
+                 "Education & Campus", "Urban Housing", "Anime & Manga", "Film Directing", 
+                 "Modern Art", "Music Industry", "Ghibli Films", "Comic Culture", 
+                 "Culinary Trends", "Dance & Festivals", "Asian Beauty", "Governance & Funding", 
+                 "Rap & Hip-Hop", "Political Dynamics", "Streaming & Drama", "Cultural Heritage", 
+                 "Hollywood Cinema")
+
+
+
+```
+
+
+
+```{r}
+library(ggthemes)
+td_beta <- tidy(stmFitted)
+td_gamma <-
+  tidy(stmFitted,
+       matrix = "gamma",
+       document_names = rownames(dfm_processed))
+
+td_beta$topic <- factor(td_beta$topic, labels = topic_names)
+td_gamma$topic <- factor(td_gamma$topic, labels = topic_names)
+td_gamma
+
+top_terms <- td_beta %>%
+  arrange(beta) %>%
+  group_by(topic) %>%
+  top_n(6, beta) %>%
+  arrange(-beta) %>%
+  select(topic, term) %>%
+  summarise(terms = list(term)) %>%
+  mutate(terms = map(terms, paste, collapse = ", ")) %>%
+  unnest()
+
+gamma_terms <- td_gamma %>%
+  group_by(topic) %>%
+  summarise(gamma = mean(gamma)) %>%
+  arrange(desc(gamma)) %>%
+  left_join(top_terms, by = "topic") %>%
+  mutate(topic = topic,
+         topic = reorder(topic, gamma))
+library(scales)
+gamma_terms %>%
+  top_n(29, gamma) %>%
+  ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+  geom_col(show.legend = FALSE) +
+  geom_text(
+    hjust = 0,
+    nudge_y = 0.0005,
+    size = 3,
+    family = "IBMPlexSans"
+  ) +
+  coord_flip() +
+  scale_y_continuous(expand = c(0, 0),
+                     limits = c(0, 0.3),
+                     labels = percent_format()) +
+  theme_tufte(base_family = "IBMPlexSans", ticks = FALSE) +
+  theme(
+    plot.title = element_text(size = 16,
+                              family = "IBMPlexSans-Bold"),
+    plot.subtitle = element_text(size = 13)
+  ) +
+  labs(
+    x = NULL,
+    y = expression(gamma),
+    title = "Topics by prevalence",
+    subtitle = "With the top words that contribute to each topic"
+  )
+ggsave("my_plot.png", width = 10, height = 8, dpi = 400)
+# I save them as document metadata.
+docvars(dfm_processed , 'STMtopic') <-
+  apply(stmFitted$theta, 1, which.max)
+
+library(huge)
+mod.out.corr <- topicCorr(stmFitted,method="huge",verbose=TRUE)
+set.seed(1224)
+png("my_base_plot_white_background2.png", width = 1400, height = 1200, bg = "white")
+plot(mod.out.corr, vlabels = topic_names,vertex.label.cex=2)
+dev.off()
+
+```
+
+
+```{r}
+# Adjusted mapping from topic number to group number based on the new order
+topic_to_group <- c(
+  1, 1, 2, 5, 2, 3, 4, 5, 2, 4, 1, 9, 6, 6, 7, 8, 8, 5, 7, 8, 3, 2, 3, 6, 5, 6, 1, 2, 1
+)
+
+# Group Labels
+group_labels <- c("Entertainment & Media", "Arts & Culture", "Fashion & Lifestyle", 
+                  "Technology & Digital Media", "Business & Industry", "Sociopolitical Issues", 
+                  "Japanese Culture & Anime", "Creative Arts", "Sports")
+
+# Assuming you have a Year column in your data
+docvars(dfm_processed , 'STMtopic') <- apply(stmFitted$theta, 1, which.max)
+doc_metadata <- as.data.frame(docvars(dfm_processed))
+
+# Map topics to groups
+doc_metadata$GroupTopic <- factor(topic_to_group[doc_metadata$STMtopic], labels = group_labels)
+
+yearly_group_proportions <- doc_metadata %>%
+  group_by(Year, GroupTopic) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(Year) %>%
+  mutate(Proportion = Count / sum(Count)) %>%
+  ungroup()
+
+
+
+# Define a vector of distinct colors for the 9 groups
+distinct_colors <- c("#e6194b", "#3cb44b", "#ffe119", "#0082c8", "#f58231",
+                     "#911eb4", "#46f0f0", "#f032e6", "#d2f53c")
+
+# proportion
+ggplot(yearly_group_proportions, aes(x = Year, y = Proportion, fill = as.factor(GroupTopic))) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = percent_format()) +
+  scale_fill_manual(values = distinct_colors,labels=group_labels) +
+  theme_minimal() +
+  labs(x = "Year", y = "Proportion of Group", fill = "Group", title = "Yearly Group Proportions") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Stacked Bar Plot for Yearly Group Counts
+ggplot(yearly_group_proportions, aes(x = Year, y = Count, fill = GroupTopic)) +
+  geom_bar(stat = "identity", position = "stack") +
+  scale_fill_manual(values = distinct_colors, labels = group_labels) +
+  theme_minimal() +
+  labs(x = "Year", y = "Count of Groups", fill = "Group", title = "Yearly Group Counts") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  guides(fill = guide_legend(title = "Group", ncol = 1))
+
+# Interactive Line Plot for Group Proportion Over Time
+ggplot_object <- ggplot(yearly_group_proportions, aes(x = Year, y = Proportion, group = GroupTopic, color = GroupTopic)) +
+  geom_line() +
+  scale_y_continuous(labels = percent_format()) +
+  scale_color_manual(values = distinct_colors, labels = group_labels) +
+  theme_minimal() +
+  labs(x = "Year", y = "Proportion of Group", color = "Grouped Topics", title = "Group Proportion Over Time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# Convert to an interactive plotly plot
+library(plotly)
+interactive_plot <- ggplotly(ggplot_object)
+
+# Print the interactive plot
+interactive_plot
+
+yearly_topic_proportions <- doc_metadata %>%
+  group_by(Year, STMtopic) %>%
+  summarise(Count = n(), .groups = "drop") %>%
+  group_by(Year) %>%
+  mutate(Proportion = Count / sum(Count)) %>%
+  ungroup()
+library(RColorBrewer)
+
+# Assuming you have a dataframe 'yearly_topic_proportions' with columns Year, Proportion, STMtopic
+# and a vector 'topic_names' for the names of the topics.
+
+library(RColorBrewer)
+
+# Get all qualitative color palettes
+qual_col_pals = brewer.pal.info[brewer.pal.info$category == 'qual', ]
+
+# Create a concatenated color vector
+col_vector = unlist(mapply(brewer.pal, qual_col_pals$maxcolors, rownames(qual_col_pals)))
+col_vector<-col_vector[1:29]
+
+# Iterate over the palettes and concatenate colors
+for (palette_name in rownames(qual_col_pals)) {
+  col_vector = c(col_vector, brewer.pal(qual_col_pals$maxcolors[palette_name], palette_name))
+  
+  # Break the loop if we have 29 or more colors
+  if (length(col_vector) >= 29) {
+    break
+  }
+}
+
+# Trim the color vector to 29 colors if it exceeds that number
+distinct_colors = col_vector[1:29]
+
+# col_vector now contains 29 distinct colors
+
+
+ggplot(yearly_topic_proportions, aes(x = Year, y = Proportion, fill = as.factor(STMtopic))) +
+  geom_bar(stat = "identity", position = "fill") +
+  scale_y_continuous(labels = scales::percent_format()) +
+  scale_fill_manual(values = distinct_colors, labels = topic_names) +
+  theme_minimal() +
+  labs(x = "Year", y = "Proportion of Topics", fill = "Group", title = "Yearly Topic Proportions") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+
+```
+
+
+```{r}
+prep <-
+  estimateEffect(1:29 ~ s(Year), stmFitted, meta = DfmStm$meta)
+summary(prep)
+prep$topics<-topic_names
+
+plot(prep, "Year", method = "continuous")
+summary(DfmStm$meta)
+```
+
+
+
+
+
+
+
