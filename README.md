@@ -50,21 +50,18 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 
 ## Repository Structure
 
-- `scripts/`: R scripts for each stage of the analysis
-- `data/`: Raw and processed data files
+- `anime_nyt_analysis.Rmd`: R Markdown file containing the entire analysis
+- `data/`: Raw data file (anime_texts.txt)
 - `output/`: Generated plots and results
-- `docs/`: Detailed documentation and analysis report
+- `anime_nyt_analysis.html`: Knitted HTML report of the analysis
 
 ## How to Run
 
-
 1. Clone this repository
-2. Install required R packages: `source("scripts/00_setup.R")`
-3. You need to gather the texts yourself. I am not allowed to publish content of the New York Times.
-    - You can access the data by using news archives like ProQuest. Most universities should have access for students. Ask your chair or check your Uni website.
-    - Not a student. ProQuest access can be quite expensive but there are similar datasources on the Cyberweb.
-4. Run scripts in numerical order from `01_data_preparation.R` to `05_visualization.R`
-5. View results in the `output/` directory
+2. Open the `anime_nyt_analysis.Rmd` file in RStudio
+3. Install required R packages (listed at the beginning of the R Markdown file)
+4. Run all chunks in the R Markdown file or knit the document to HTML
+5. View results in the `output/` directory and in the generated HTML report
 
 ## Full Report
 
