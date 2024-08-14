@@ -37,7 +37,7 @@ This analysis explores the evolution of anime coverage in The New York Times ove
 
 ## Technologies Used
 
-- R (version X.X.X)
+- R (version 4.3.1)
 - Key packages: 
   - [stm](https://www.structuraltopicmodel.com/) (for topic modeling)
   - [quanteda](https://quanteda.io/) (for text preprocessing)
