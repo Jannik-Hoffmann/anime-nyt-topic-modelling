@@ -8,31 +8,31 @@ This project analyzes the representation and themes associated with anime in The
 
 ## Project Overview
 
-This analysis explores the evolution of anime coverage in The New York Times over four decades. Using advanced natural language processing techniques, specifically Semi-Supervised Topic Modeling, we uncover the main themes and trends in anime-related articles, providing insights into the changing perception and cultural impact of anime in the United States.
+This analysis explores the evolution of anime coverage in The New York Times over four decades. Using advanced natural language processing techniques, specifically Semi-Supervised Topic Modeling, I uncover the main themes and trends in anime-related articles, providing insights into the changing perception and cultural impact of anime in the United States.
 
 ## Objectives
-
 - Track the evolution of anime coverage in The New York Times from 1981 to 2023
 - Identify and analyze the main topics associated with anime in these articles
 - Investigate the "Anime spillover effect" hypothesis, which suggests that increased interest in anime leads to broader engagement with Japanese culture
 
-## Data Source
+## Methodology
 
+1. Data Collection and Preprocessing
 - 1,219 articles from The New York Times mentioning "anime" (1981-2023)
 - Collected via ProQuest archive query
 - Cleaned and preprocessed to remove irrelevant content and standardize text
 ![articles_anime_plot](https://github.com/user-attachments/assets/d8352139-7e96-4342-b008-89fe0e04d810)
-## Methodology
-
-1. Data Collection and Preprocessing
-2. Exploratory Data Analysis
+3. Exploratory Data Analysis
 ![image](https://github.com/user-attachments/assets/14bf72fe-35dd-41b3-a7b1-93ac679e20c8)
+![image](https://github.com/user-attachments/assets/c7ea22c5-07c5-4cab-946e-b57fee9ac238)
 
 4. Semi-Supervised Topic Modeling (STM)
+![image](https://github.com/user-attachments/assets/71072d61-11dc-49b3-970a-2ee5846dd703)
 ![image](https://github.com/user-attachments/assets/949c8b8a-22b4-41af-93fd-c798529e544d)
 
-5. Topic Analysis and Interpretation
-6. Visualization of Results
+6. Topic Analysis and Interpretation
+![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
+7. Visualization of Results
 
 ## Key Findings
 
