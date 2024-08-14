@@ -69,7 +69,6 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 - `anime_nyt_analysis.Rmd`: R Markdown file containing the entire analysis
 - `data/`: Raw data file (anime_texts.txt)
 - `output/`: Generated plots and results
-- `anime_nyt_analysis.html`: Knitted HTML report of the analysis
 
 ## How to Run
 
