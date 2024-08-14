@@ -66,12 +66,10 @@ By leveraging multiprocessing capabilities, I was able to efficiently train mult
 ## Full Report
 
 ![my_plot](https://github.com/user-attachments/assets/bc5d3d00-2276-4a05-bb09-53c394d79839)
+
 ![my_base_plot_white_background](https://github.com/user-attachments/assets/b34a462b-395f-4c93-affb-8deaf95ec051)
-For a detailed analysis and discussion of findings, please see the [full report](link-to-html-report).
 
-## Contributors
 
-- [Your Name](link-to-your-github-profile)
 
 ## License
 
